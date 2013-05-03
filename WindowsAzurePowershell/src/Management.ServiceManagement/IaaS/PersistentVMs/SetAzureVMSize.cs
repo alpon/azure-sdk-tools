@@ -12,7 +12,6 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
 {
     using System;
@@ -23,8 +22,7 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
     public class SetAzureVMSizeCommand : VirtualMachineConfigurationCmdletBase
     {
         [Parameter(Position = 0, Mandatory = true, HelpMessage = "Represents the size of the machine.")]
-        [ValidateSet("ExtraSmall", "Small", "Medium", "Large", "ExtraLarge", IgnoreCase = true)]
-        [ValidateNotNullOrEmpty]
+        [ValidateSet("ExtraSmall", "Small", "Medium", "Large", "ExtraLarge", "A6", "A7", IgnoreCase = true)]
         public string InstanceSize
         {
             get;

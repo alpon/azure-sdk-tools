@@ -12,16 +12,14 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.WindowsAzure.ServiceManagement;
-
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS.DiskRepository
 {
     using System;
-    using System.ServiceModel;
     using System.Management.Automation;
-    using Management.Model;
+    using System.ServiceModel;
     using Helpers;
-    using Cmdlets.Common;
+    using Utilities.Common;
+    using WindowsAzure.ServiceManagement;
 
     [Cmdlet(VerbsCommon.Remove, "AzureVMImage"), OutputType(typeof(ManagementOperationContext))]
     public class RemoveAzureVMImage : ServiceManagementBaseCmdlet

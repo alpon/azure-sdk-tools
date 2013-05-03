@@ -17,10 +17,9 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.Test.UnitTests.Cmd
     using System;
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.WindowsAzure.Management.Extensions;
     using Microsoft.WindowsAzure.Management.ServiceManagement.StorageServices;
-    using Microsoft.WindowsAzure.Management.Test.Stubs;
-    using Microsoft.WindowsAzure.Management.Test.Tests.Utilities;
+    using Microsoft.WindowsAzure.Management.Test.Utilities.Common;
+    using Microsoft.WindowsAzure.Management.Utilities.Common;
 
     [TestClass]
     public class AddAzureVhdCommandTests : TestBase
@@ -32,13 +31,13 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.Test.UnitTests.Cmd
         {
             CmdletSubscriptionExtensions.SessionManager = new InMemorySessionManager();
             files = new FileSystemHelper(this);
-            files.CreateAzureSdkDirectoryAndImportPublishSettings();
+            //files.CreateAzureSdkDirectoryAndImportPublishSettings();
         }
 
         [TestCleanup]
         public void CleanupTest()
         {
-            files.Dispose();
+            //files.Dispose();
         }
 
         public class TestInputParameters

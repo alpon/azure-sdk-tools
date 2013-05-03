@@ -61,7 +61,25 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.Test.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Windows Azure Internal Consumption.
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string BlobKey {
+            get {
+                return ResourceManager.GetString("BlobKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string BlobUrl {
+            get {
+                return ResourceManager.GetString("BlobUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
         /// </summary>
         internal static string DefaultSubscriptionName {
             get {
@@ -79,11 +97,29 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.Test.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to c:\pstest\test.publishsettings.
+        ///   Looks up a localized string similar to .
         /// </summary>
         internal static string PublishSettingsFile {
             get {
                 return ResourceManager.GetString("PublishSettingsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UseDefaults.
+        /// </summary>
+        internal static string TestSettings {
+            get {
+                return ResourceManager.GetString("TestSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Vhd {
+            get {
+                return ResourceManager.GetString("Vhd", resourceCulture);
             }
         }
     }

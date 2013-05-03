@@ -12,15 +12,14 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.WindowsAzure.ServiceManagement;
-
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
 {
     using System;
-    using System.ServiceModel;
     using System.Management.Automation;
-    using Management.Model;
-    using Cmdlets.Common;
+    using System.ServiceModel;
+    using Utilities.Common;
+    using WindowsAzure.ServiceManagement;
+
 
     [Cmdlet(VerbsCommon.Remove, "AzureDisk"), OutputType(typeof(ManagementOperationContext))]
     public class RemoveAzureDiskCommand : ServiceManagementBaseCmdlet

@@ -12,11 +12,6 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-
-using System.Threading;
-using Microsoft.WindowsAzure.Management.Extensions;
-using Microsoft.WindowsAzure.Management.Model;
-
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
 {
     using System;
@@ -28,11 +23,12 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
     using System.ServiceModel;
     using System.ServiceModel.Channels;
     using System.ServiceModel.Web;
+    using System.Threading;
     using System.Xml;
-    using Cmdlets.Common;
-    using Microsoft.WindowsAzure.Management.Utilities;
-    using Microsoft.WindowsAzure.ServiceManagement;
+    using Utilities.Common;
+    using WindowsAzure.ServiceManagement;
     using Service.Gateway;
+    using Properties;
 
     public class GatewayCmdletBase : CloudBaseCmdlet<IGatewayServiceManagement>
     {
@@ -68,7 +64,7 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
             {
                 string errorDetails = string.Format(
                     CultureInfo.InvariantCulture,
-                    "HTTP Status Code: {0} - HTTP Error Message: {1}",
+                    Resources.HttpStatusCodeAndErrorMessage,
                     error.Code,
                     error.Message);
 
@@ -151,7 +147,7 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
                 operation = RetryCall(s => channel.GetGatewayOperation(currentSubscription.SubscriptionId, operationId));
 
                 var activityId = new Random().Next(1, 999999);
-                var progress = new ProgressRecord(activityId, opdesc, "Operation Status: " + operation.Status);
+                var progress = new ProgressRecord(activityId, opdesc, Resources.GatewayOperationStatus + operation.Status);
                 while (string.Compare(operation.Status, OperationState.Succeeded, StringComparison.OrdinalIgnoreCase) != 0 &&
                         string.Compare(operation.Status, OperationState.Failed, StringComparison.OrdinalIgnoreCase) != 0)
                 {

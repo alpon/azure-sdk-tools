@@ -12,13 +12,12 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.WindowsAzure.ServiceManagement;
 
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
 {
-    using System;
     using System.Management.Automation;
-    using Management.Model;
+    using WindowsAzure.ServiceManagement;
+    using Utilities.Common;
     using Model;
 
     [Cmdlet(VerbsLifecycle.Stop, "AzureVM", DefaultParameterSetName = "ByName"), OutputType(typeof(ManagementOperationContext))]

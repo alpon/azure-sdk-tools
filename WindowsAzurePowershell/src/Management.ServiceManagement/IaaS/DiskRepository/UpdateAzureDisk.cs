@@ -16,9 +16,9 @@
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
 {
     using System.Management.Automation;
+    using Utilities.Common;
+    using WindowsAzure.ServiceManagement;
     using Model;
-    using Cmdlets.Common;
-    using Microsoft.WindowsAzure.ServiceManagement;
 
     [Cmdlet(VerbsData.Update, "AzureDisk"), OutputType(typeof(DiskContext))]
     public class UpdateAzureDiskCommand : ServiceManagementBaseCmdlet

@@ -14,14 +14,13 @@
 
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.HostedServices
 {
-    using System.ServiceModel;
     using System.Linq;
     using System.Management.Automation;
+    using System.ServiceModel;
     using System.Xml.Linq;
-    using Cmdlets.Common;
-    using Management.Model;
+    using Utilities.Common;
     using WindowsAzure.ServiceManagement;
-    using Microsoft.WindowsAzure.Management.Utilities;
+    using Properties;
 
 
     /// <summary>
@@ -118,12 +117,12 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.HostedServices
         {
             using (new OperationContextScope(Channel.ToContextChannel()))
             {
-                WriteVerboseWithTimestamp("Begin Operation: Get Deployment");
+                WriteVerboseWithTimestamp(Resources.GetDeploymentBeginOperation);
 
                 var currentDeployment = this.RetryCall(s => this.Channel.GetDeploymentBySlot(s, this.ServiceName, this.Slot));
                 operation = GetOperation();
 
-                WriteVerboseWithTimestamp("Completed Operation: Get Deployment");
+                WriteVerboseWithTimestamp(Resources.GetDeploymentCompletedOperation);
                 return currentDeployment;
             }
         }

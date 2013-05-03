@@ -17,10 +17,11 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.StorageServices
     using System;
     using System.IO;
     using System.Management.Automation;
-    using Cmdlets.Common;
+    using Utilities.Common;
     using Model;
     using Sync.Download;
     using WindowsAzure.ServiceManagement;
+    using Properties;
 
 
     /// <summary>
@@ -88,7 +89,6 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.StorageServices
             set;
         }
 
-
         public UploadParameters ValidateParameters()
         {
             BlobUri destinationUri;
@@ -107,18 +107,42 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.StorageServices
 
                 if (!String.IsNullOrEmpty(destinationUri.Uri.Query))
                 {
-                    var message = String.Format("SAS Uri for the destination blob is not supported in patch mode:{0}", destinationUri.Uri);
+                    var message = String.Format(Resources.AddAzureVhdCommandSASUriNotSupportedInPatchMode, destinationUri.Uri);
                     throw new ArgumentOutOfRangeException("Destination", message);
                 }
             }
 
+            var storageCredentialsFactory = CreateStorageCredentialsFactory();
+
             var parameters = new UploadParameters(destinationUri, baseImageUri, LocalFilePath, OverWrite.IsPresent, NumberOfUploaderThreads)
             {
                 Cmdlet = this,
-                BlobObjectFactory = new CloudPageBlobObjectFactory(this.Channel, this.CurrentSubscription.SubscriptionId, TimeSpan.FromMinutes(1))
+                BlobObjectFactory = new CloudPageBlobObjectFactory(storageCredentialsFactory, TimeSpan.FromMinutes(1))
             };
 
             return parameters;
+        }
+
+        private StorageCredentialsFactory CreateStorageCredentialsFactory()
+        {
+            StorageCredentialsFactory storageCredentialsFactory;
+            if (StorageCredentialsFactory.IsChannelRequired(Destination))
+            {
+                storageCredentialsFactory = new StorageCredentialsFactory(this.Channel, this.CurrentSubscription);
+            }
+            else
+            {
+                storageCredentialsFactory = new StorageCredentialsFactory();
+            }
+            return storageCredentialsFactory;
+        }
+
+        protected override void InitChannelCurrentSubscription(bool force)
+        {
+            if(StorageCredentialsFactory.IsChannelRequired(this.Destination))
+            {
+                Channel = CreateChannel();
+            }
         }
 
         protected override void OnProcessRecord()

@@ -12,15 +12,14 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.WindowsAzure.ServiceManagement;
-
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
 {
     using System;
     using System.Management.Automation;
+    using Utilities.Common;
     using Model;
-    using Cmdlets.Common;
-    using Extensions;
+    using WindowsAzure.ServiceManagement;
+
 
     [Cmdlet(VerbsCommon.Add, "AzureDisk"), OutputType(typeof(DiskContext))]
     public class AddAzureDiskCommand : ServiceManagementBaseCmdlet

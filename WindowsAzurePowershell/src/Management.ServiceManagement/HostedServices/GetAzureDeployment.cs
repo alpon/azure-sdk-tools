@@ -15,8 +15,8 @@
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.HostedServices
 {
     using System.Management.Automation;
+    using Utilities.Common;
     using Model;
-    using Cmdlets.Common;
     using WindowsAzure.ServiceManagement;
 
     /// <summary>
@@ -42,7 +42,7 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.HostedServices
         }
 
         [Parameter(Position = 1, Mandatory = false, HelpMessage = "Deployment slot. Staging | Production (default Production)")]
-        [ValidateSet("Staging", "Production", IgnoreCase = true)]
+        [ValidateSet(DeploymentSlotType.Staging, DeploymentSlotType.Production, IgnoreCase = true)]
         public string Slot
         {
             get;
@@ -62,7 +62,7 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.HostedServices
         {
             if (string.IsNullOrEmpty(this.Slot))
             {
-                this.Slot = "Production";
+                this.Slot = DeploymentSlotType.Production;
             }
 
             ExecuteClientActionInOCS(

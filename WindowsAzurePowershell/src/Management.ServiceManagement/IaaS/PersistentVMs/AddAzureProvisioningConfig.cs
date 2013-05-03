@@ -12,15 +12,18 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.WindowsAzure.ServiceManagement;
-
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
 {
     using System;
     using System.Linq;
     using System.Management.Automation;
+    using System.Collections.Generic;
+    using System.Security.Cryptography.X509Certificates;
+    using WindowsAzure.ServiceManagement;
     using Common;
     using Model;
+    using Helpers;
+    using Properties;
 
     /// <summary>
     /// Updates a persistent VM object with a provisioning configuration.
@@ -145,6 +148,43 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
                         netConfig.InputEndpoints.Add(rdpEndpoint);
                     }
                 }
+
+                if (!this.DisableWinRMHttps.IsPresent)
+                {
+                    var netConfig = role.ConfigurationSets
+                        .OfType<NetworkConfigurationSet>()
+                        .SingleOrDefault();
+
+                    if (netConfig == null)
+                    {
+                        netConfig = new NetworkConfigurationSet();
+                        role.ConfigurationSets.Add(netConfig);
+                    }
+
+                    if (netConfig.InputEndpoints == null)
+                    {
+                        netConfig.InputEndpoints = new System.Collections.ObjectModel.Collection<InputEndpoint>();
+                    }
+
+                    var builder = new WinRmConfigurationBuilder();
+                    if (this.EnableWinRMHttp.IsPresent)
+                    {
+                        builder.AddHttpListener();
+                    }
+                    builder.AddHttpsListener(this.WinRMCertificate);
+                    provisioningConfiguration.WinRM = builder.Configuration;
+
+                    var winRmEndpoint = new InputEndpoint {LocalPort = WinRMConstants.HttpsListenerPort, Protocol = "tcp", Name = WinRMConstants.EndpointName};
+                    netConfig.InputEndpoints.Add(winRmEndpoint);
+                    role.WinRMCertificate = WinRMCertificate;
+                }
+
+                role.X509Certificates = new List<X509Certificate2>();
+                if (this.X509Certificates != null)
+                {
+                    role.X509Certificates.AddRange(this.X509Certificates);
+                }
+                role.NoExportPrivateKey = this.NoExportPrivateKey.IsPresent;
             }
 
             WriteObject(VM, true);
@@ -169,22 +209,22 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.IaaS
             
             if (string.Compare(ParameterSetName, "Linux", StringComparison.OrdinalIgnoreCase) == 0 && ValidationHelpers.IsLinuxPasswordValid(Password) == false)
             {
-                throw new ArgumentException("Password does not meet complexity requirements.");
+                throw new ArgumentException(Resources.PasswordNotComplexEnough);
             }
 
             if ((string.Compare(ParameterSetName, "Windows", StringComparison.OrdinalIgnoreCase) == 0 || string.Compare(ParameterSetName, "WindowsDomain", StringComparison.OrdinalIgnoreCase) == 0) && ValidationHelpers.IsWindowsPasswordValid(Password) == false)
             {
-                throw new ArgumentException("Password does not meet complexity requirements.");
+                throw new ArgumentException(Resources.PasswordNotComplexEnough);
             }
 
             if (string.Compare(ParameterSetName, "Linux", StringComparison.OrdinalIgnoreCase) == 0 && ValidationHelpers.IsLinuxHostNameValid(vm.RoleName) == false)
             {
-                throw new ArgumentException("Hostname is invalid.");
+                throw new ArgumentException(Resources.InvalidHostName);
             }
 
             if ((string.Compare(ParameterSetName, "Windows", StringComparison.OrdinalIgnoreCase) == 0 || string.Compare(ParameterSetName, "WindowsDomain", StringComparison.OrdinalIgnoreCase) == 0) && ValidationHelpers.IsWindowsComputerNameValid(vm.RoleName) == false)
             {
-                throw new ArgumentException("Computer Name is invalid.");
+                throw new ArgumentException(Resources.InvalidComputerName);
             }
         }
     }

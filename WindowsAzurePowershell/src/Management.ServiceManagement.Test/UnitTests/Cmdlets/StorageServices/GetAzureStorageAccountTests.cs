@@ -13,9 +13,8 @@
 // ----------------------------------------------------------------------------------
 namespace Microsoft.WindowsAzure.Management.ServiceManagement.Test.UnitTests.Cmdlets.StorageServices
 {
-    using Extensions;
-    using Management.Test.Stubs;
-    using Microsoft.WindowsAzure.Management.Test.Tests.Utilities;
+    using Microsoft.WindowsAzure.Management.Test.Utilities.Common;
+    using Microsoft.WindowsAzure.Management.Utilities.Common;
     using VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -28,13 +27,13 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.Test.UnitTests.Cmd
         {
             CmdletSubscriptionExtensions.SessionManager = new InMemorySessionManager();
             files = new FileSystemHelper(this);
-            files.CreateAzureSdkDirectoryAndImportPublishSettings();
+            //files.CreateAzureSdkDirectoryAndImportPublishSettings();
         }
 
         [TestCleanup]
         public void CleanupTest()
         {
-            files.Dispose();
+            //files.Dispose();
         }
 
         [TestMethod]

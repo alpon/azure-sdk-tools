@@ -76,3 +76,216 @@ function Test-RemoveAzureServiceWithWhatIf
 	# Assert
 	Assert-Throws { Get-AzureWebsite $name } $expected
 }
+
+########################################################################### Get-AzureWebsiteLog Scenario Tests ###########################################################################
+
+<#
+.SYNOPSIS
+Tests Get-AzureWebsiteLog with -Tail
+#>
+function Test-GetAzureWebsiteLogTail
+{
+	# Setup
+	New-BasicLogWebsite
+	$website = $global:currentWebsite
+	$client = New-Object System.Net.WebClient
+	$uri = "http://" + $website.HostNames[0]
+	$client.BaseAddress = $uri
+	$count = 0
+	cd ..
+
+	#Test
+	Get-AzureWebsiteLog -Name $website.Name -Tail -Message "㯑䲘䄂㮉" | % {
+		if ($_ -like "*㯑䲘䄂㮉*") { exit; }
+		Retry-DownloadString $client $uri
+		$count++
+		if ($count -gt 50) { throw "Logs were not found"; }
+	}
+}
+
+<#
+.SYNOPSIS
+Tests Get-AzureWebsiteLog with -Tail with special characters in uri.
+#>
+function Test-GetAzureWebsiteLogTailUriEncoding
+{
+	# Setup
+	New-BasicLogWebsite
+	$website = $global:currentWebsite
+	$client = New-Object System.Net.WebClient
+	$uri = "http://" + $website.HostNames[0]
+	$client.BaseAddress = $uri
+	$count = 0
+	cd ..
+
+	#Test
+	Get-AzureWebsiteLog -Name $website.Name -Tail -Message "mes/a:q;" | % {
+		if ($_ -like "*mes/a:q;*") { exit; }
+		Retry-DownloadString $client $uri
+		$count++
+		if ($count -gt 50) { throw "Logs were not found"; }
+	}
+}
+
+<#
+.SYNOPSIS
+Tests Get-AzureWebsiteLog with -Tail
+#>
+function Test-GetAzureWebsiteLogTailPath
+{
+	# Setup
+	New-BasicLogWebsite
+	$website = $global:currentWebsite
+	$client = New-Object System.Net.WebClient
+	$uri = "http://" + $website.HostNames[0]
+	$client.BaseAddress = $uri
+	Set-AzureWebsite -RequestTracingEnabled $true -HttpLoggingEnabled $true -DetailedErrorLoggingEnabled $true
+	1..10 | % { Retry-DownloadString $client $uri }
+	Start-Sleep -Seconds 30
+	cd ..
+
+	#Test
+	$retry = $false
+	do
+	{
+		try
+		{
+			Get-AzureWebsiteLog -Name $website.Name -Tail -Path http | % {
+				if ($_ -like "*")
+				{
+					exit
+				}
+				throw "HTTP path is not reached"
+			}
+		}
+		catch
+		{
+			if ($_.Exception.Message -eq "One or more errors occurred.")
+			{
+				$retry = $true;
+				Write-Warning "Retry Test-GetAzureWebsiteLogTailPath"
+				continue;
+			}
+
+			throw $_.Exception
+		}
+	} while ($retry)
+}
+
+<#
+.SYNOPSIS
+Tests Get-AzureWebsiteLog with -ListPath
+#>
+function Test-GetAzureWebsiteLogListPath
+{
+	# Setup
+	New-BasicLogWebsite
+
+	#Test
+	$retry = $false
+	do
+	{
+		try
+		{
+			$actual = Get-AzureWebsiteLog -ListPath;
+			$retry = $false
+		}
+		catch
+		{
+			if ($_.Exception.Message -like "For security reasons DTD is prohibited in this XML document.*")
+			{
+				$retry = $true;
+				Write-Warning "Retry Test-GetAzureWebsiteLogListPath"
+				continue;
+			}
+			cd ..
+			throw $_.Exception
+		}
+	} while ($retry)
+
+	# Assert
+	Assert-AreEqual 1 $actual.Count
+	Assert-AreEqual "Git" $actual
+	cd ..
+}
+
+########################################################################### Get-AzureWebsite Scenario Tests ###########################################################################
+
+<#
+.SYNOPSIS
+Tests Get-AzureWebsite
+#>
+function Test-GetAzureWebsite
+{
+	# Setup
+	$name = Get-WebsiteName
+	New-AzureWebsite $name
+	Enable-AzureWebsiteDiagnostic -Name $name -Type Application -Output FileSystem -LogLevel Error
+
+	#Test
+	$config = Get-AzureWebsite -Name $name
+
+	# Assert
+	Assert-AreEqual $true $config.AzureDriveTraceEnabled
+}
+
+########################################################################### Start-AzureWebsite Scenario Tests ###########################################################################
+
+<#
+.SYNOPSIS
+Tests Start-AzureWebsite happy path.
+#>
+function Test-StartAzureWebsite
+{
+	# Setup
+	$name = Get-WebsiteName
+	New-AzureWebsite $name
+	Stop-AzureWebsite $name
+	Assert-Throws { Get-AzureWebsite $name }
+
+	# Test
+	Start-AzureWebsite $name
+
+	# Assert
+	$website = Get-AzureWebsite $name
+	Assert-AreEqual "Running" $website.State
+}
+
+########################################################################### Stop-AzureWebsite Scenario Tests ###########################################################################
+
+<#
+.SYNOPSIS
+Tests Stop-AzureWebsite happy path.
+#>
+function Test-StopAzureWebsite
+{
+	# Setup
+	$name = Get-WebsiteName
+	New-AzureWebsite $name
+
+	# Test
+	Stop-AzureWebsite $name
+
+	# Assert
+	Assert-Throws { Get-AzureWebsite $name }
+}
+
+########################################################################### Restart-AzureWebsite Scenario Tests ###########################################################################
+
+<#
+.SYNOPSIS
+Tests Restart-AzureWebsite happy path.
+#>
+function Test-RestartAzureWebsite
+{
+	# Setup
+	$name = Get-WebsiteName
+	New-AzureWebsite $name
+
+	# Test
+	Restart-AzureWebsite $name
+
+	# Assert
+	$website = Get-AzureWebsite $name
+	Assert-AreEqual "Running" $website.State
+}
